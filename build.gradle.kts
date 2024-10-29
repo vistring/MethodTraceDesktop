@@ -25,19 +25,26 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
+
     // add network support
     implementation("io.ktor:ktor-client-core:$ktor")
     implementation("io.ktor:ktor-client-java:$ktor")
     implementation("io.ktor:ktor-client-jetty:$ktor")
     implementation("io.ktor:ktor-client-content-negotiation:$ktor")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+
     // add coroutines support
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.9.0")
     implementation("org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+
     // add material design3
     // implementation("androidx.compose.material3:material3:1.3.0")
     // implementation("org.jetbrains.compose.material:material-desktop:1.7.0")
+
+    // add navigation for desktop
+    implementation("org.jetbrains.androidx.navigation:navigation-compose:2.8.0-alpha10")
+
 }
 
 compose.desktop {

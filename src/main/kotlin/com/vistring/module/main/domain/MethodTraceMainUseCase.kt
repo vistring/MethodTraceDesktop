@@ -1,4 +1,4 @@
-package com.vistring.domain
+package com.vistring.module.main.domain
 
 import com.vistring.model.MethodTraceGroupInfoDto
 import com.vistring.network.AppApi
@@ -9,13 +9,18 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
-interface MethodTraceUseCase {
+interface MethodTraceMainUseCase {
 
     companion object {
 
         const val PAGE_SIZE = 10
+        const val APP_NAME_BLINK = "Blink"
+        const val APP_NAME_MAGPIE = "Magpie"
+        const val APP_NAME_VS_METHOD_TRACE_DEMO = "VSMethodTraceDemo"
 
     }
+
+    val appSelectedState: StateFlow<String>
 
     val currentPageState: StateFlow<Int>
 
@@ -40,9 +45,11 @@ interface MethodTraceUseCase {
 
 }
 
-class MethodTraceUseCaseImpl : MethodTraceUseCase {
+class MethodTraceMainUseCaseImpl : MethodTraceMainUseCase {
 
     private val scope = MainScope()
+
+    override val appSelectedState = MutableStateFlow(value = MethodTraceMainUseCase.APP_NAME_VS_METHOD_TRACE_DEMO)
 
     override val currentPageState = MutableStateFlow(value = 1)
 
@@ -54,8 +61,9 @@ class MethodTraceUseCaseImpl : MethodTraceUseCase {
                 currentPageState.emit(value = 1)
                 currentPageListState.emit(
                     value = AppApi.requestGroupInfo(
+                        appId = appSelectedState.first(),
                         pageNumber = 1,
-                        pageSize = MethodTraceUseCase.PAGE_SIZE,
+                        pageSize = MethodTraceMainUseCase.PAGE_SIZE,
                     ),
                 )
             }
@@ -70,8 +78,9 @@ class MethodTraceUseCaseImpl : MethodTraceUseCase {
             )
             currentPageListState.emit(
                 value = AppApi.requestGroupInfo(
+                    appId = appSelectedState.first(),
                     pageNumber = nextPageNumber,
-                    pageSize = MethodTraceUseCase.PAGE_SIZE,
+                    pageSize = MethodTraceMainUseCase.PAGE_SIZE,
                 ),
             )
         }
@@ -81,8 +90,9 @@ class MethodTraceUseCaseImpl : MethodTraceUseCase {
         scope.launch {
             val nextPageNumber = currentPageState.first() + 1
             val newDataList = AppApi.requestGroupInfo(
+                appId = appSelectedState.first(),
                 pageNumber = nextPageNumber,
-                pageSize = MethodTraceUseCase.PAGE_SIZE,
+                pageSize = MethodTraceMainUseCase.PAGE_SIZE,
             )
             if (newDataList.isNotEmpty()) {
                 currentPageListState.emit(
