@@ -2,6 +2,7 @@ package com.vistring.module.detail.view
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme
@@ -67,22 +68,24 @@ fun MethodTraceDetailView(
                 textAlign = TextAlign.Center,
             )
 
-            Text(
-                modifier = Modifier
-                    .align(
-                        alignment = androidx.compose.ui.Alignment.Start,
-                    )
-                    .padding(
-                        horizontal = 24.dp,
-                        vertical = 16.dp,
-                    ).verticalScroll(
-                        state = rememberScrollState(),
+            SelectionContainer {
+                Text(
+                    modifier = Modifier
+                        .align(
+                            alignment = androidx.compose.ui.Alignment.Start,
+                        )
+                        .padding(
+                            horizontal = 24.dp,
+                            vertical = 16.dp,
+                        ).verticalScroll(
+                            state = rememberScrollState(),
+                        ),
+                    text = stackTraceFormatStr.orEmpty(),
+                    style = MaterialTheme.typography.body1.copy(
+                        color = MaterialTheme.colors.error,
                     ),
-                text = stackTraceFormatStr.orEmpty(),
-                style = MaterialTheme.typography.body1.copy(
-                    color = MaterialTheme.colors.error,
-                ),
-            )
+                )
+            }
 
         }
     }

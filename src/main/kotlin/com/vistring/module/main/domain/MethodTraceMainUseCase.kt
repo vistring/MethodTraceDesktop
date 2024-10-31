@@ -2,6 +2,7 @@ package com.vistring.module.main.domain
 
 import com.vistring.model.MethodTraceGroupInfoDto
 import com.vistring.network.AppApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,12 @@ interface MethodTraceMainUseCase {
         const val APP_NAME_MAGPIE = "Magpie"
         const val APP_NAME_VS_METHOD_TRACE_DEMO = "VSMethodTraceDemo"
 
+        val APP_NAME_LIST = listOf(
+            APP_NAME_BLINK,
+            APP_NAME_MAGPIE,
+            APP_NAME_VS_METHOD_TRACE_DEMO,
+        )
+
     }
 
     val appSelectedState: StateFlow<String>
@@ -29,7 +36,7 @@ interface MethodTraceMainUseCase {
     /**
      * 刷新数据
      */
-    fun refresh()
+    fun refresh(): Job
 
     /**
      * 上一页
@@ -40,6 +47,8 @@ interface MethodTraceMainUseCase {
      * 下一页
      */
     fun nextPage()
+
+    fun selectApp(appName: String)
 
     fun destroy()
 
@@ -55,8 +64,8 @@ class MethodTraceMainUseCaseImpl : MethodTraceMainUseCase {
 
     override val currentPageListState = MutableStateFlow<List<MethodTraceGroupInfoDto>>(value = emptyList())
 
-    override fun refresh() {
-        scope.launch {
+    override fun refresh(): Job {
+        return scope.launch {
             runCatching {
                 currentPageState.emit(value = 1)
                 currentPageListState.emit(
@@ -102,6 +111,15 @@ class MethodTraceMainUseCaseImpl : MethodTraceMainUseCase {
                     value = nextPageNumber,
                 )
             }
+        }
+    }
+
+    override fun selectApp(appName: String) {
+        scope.launch {
+            appSelectedState.emit(
+                value = appName,
+            )
+            refresh().join()
         }
     }
 

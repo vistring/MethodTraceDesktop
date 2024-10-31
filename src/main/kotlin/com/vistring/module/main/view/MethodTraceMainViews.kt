@@ -1,18 +1,21 @@
 package com.vistring.module.main.view
 
 import AppScreen
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.vistring.model.MethodTraceGroupInfoDto
@@ -90,17 +93,36 @@ fun MethodTraceGroupListView(
     val currentPage by vm.currentPageState.collectAsState(initial = 1)
     val datalist by vm.currentPageListState.collectAsState(initial = emptyList())
 
+    var isShowSelectApp by remember {
+        mutableStateOf(value = false)
+    }
+
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    vm.refresh()
-                },
-            ) {
-                Icon(
-                    Icons.Filled.Refresh,
-                    contentDescription = "Refresh",
+            Column {
+                FloatingActionButton(
+                    onClick = {
+                        isShowSelectApp = true
+                    },
+                ) {
+                    Icon(
+                        Icons.Filled.Menu,
+                        contentDescription = "Menu",
+                    )
+                }
+                Spacer(
+                    modifier = Modifier.height(12.dp)
                 )
+                FloatingActionButton(
+                    onClick = {
+                        vm.refresh()
+                    },
+                ) {
+                    Icon(
+                        Icons.Filled.Refresh,
+                        contentDescription = "Refresh",
+                    )
+                }
             }
         }
     ) {
@@ -120,7 +142,8 @@ fun MethodTraceGroupListView(
                     color = MaterialTheme.colors.onBackground,
                 )
             }
-        } else {
+        } else // 占位
+        {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -186,6 +209,50 @@ fun MethodTraceGroupListView(
                 Spacer(
                     modifier = Modifier.height(height = 24.dp)
                 )
+            }
+        }
+
+        if (isShowSelectApp) {
+            Dialog(
+                onDismissRequest = {
+                    isShowSelectApp = false
+                },
+            ) {
+                Column(
+                    modifier = Modifier
+                        .width(
+                            intrinsicSize = IntrinsicSize.Max,
+                        )
+                        .wrapContentHeight()
+                        .clip(
+                            shape = MaterialTheme.shapes.medium,
+                        )
+                        .background(
+                            color = MaterialTheme.colors.surface,
+                        ),
+                    horizontalAlignment = androidx.compose.ui.Alignment.CenterHorizontally,
+                ) {
+                    MethodTraceMainUseCase
+                        .APP_NAME_LIST
+                        .forEachIndexed { index, item ->
+                            if (index > 0) {
+                                Divider()
+                            }
+                            Text(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight()
+                                    .clickable {
+                                        isShowSelectApp = false
+                                        vm.selectApp(appName = item)
+                                    }
+                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                text = item,
+                                style = MaterialTheme.typography.h5,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                }
             }
         }
 
